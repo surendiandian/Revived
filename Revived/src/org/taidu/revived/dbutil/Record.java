@@ -75,7 +75,21 @@ public class Record {
 				//遍历所有方法，并且判断该方法和约定方法名是否一致，如果一致就调用，赋值 
 				for (Method method : methods) {
 					if (method.getName().equals(setMethodName)) {
-						method.invoke(model, rs.getString(columnName));
+						// 获取set参数类型
+						Class<?> clazz = method.getParameterTypes()[0];
+						// 获取类名 去掉包名
+						String className = clazz.getName().substring(
+								clazz.getName().lastIndexOf('.') + 1);
+						// 根据类名获取ResultSet的get方法
+						Method rsGetMethod = ResultSet.class.getMethod("get"
+								+ className, String.class);
+						// 执行ResultSet得get方法得到字段值
+						Object val = rsGetMethod.invoke(rs, columnName);
+						// 判断得到值是否为空
+						if (null != val) {
+							// 执行实体类的set方法，赋值
+							method.invoke(model, val);
+						}
 					}
 				}
 			}
@@ -109,7 +123,21 @@ public class Record {
 							+ columnName.substring(1).toLowerCase();
 					for (Method method : methods) {
 						if (method.getName().equals(setMethodName)) {
-							method.invoke(model, rs.getString(columnName));
+							// 获取set参数类型
+							Class<?> clazz = method.getParameterTypes()[0];
+							// 获取类名 去掉包名
+							String className = clazz.getName().substring(
+									clazz.getName().lastIndexOf('.') + 1);
+							// 根据类名获取ResultSet的get方法
+							Method rsGetMethod = ResultSet.class.getMethod("get"
+									+ className, String.class);
+							// 执行ResultSet得get方法得到字段值
+							Object val = rsGetMethod.invoke(rs, columnName);
+							// 判断得到值是否为空
+							if (null != val) {
+								// 执行实体类的set方法，赋值
+								method.invoke(model, val);
+							}
 						}
 					}
 				}
